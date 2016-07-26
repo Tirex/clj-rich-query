@@ -59,10 +59,20 @@
     (is (= "order by players.id desc" (f [[e/players-id :desc]])))
     (is (= "order by players.id desc,  players.name desc" (f [[e/players-id :desc] [e/players-name :desc]]))) ))
 
+
+(deftest as 
+  (let [f #(#'q/as %1 %2)]
+    (is (= (f e/players-id "pid")      
+           {:name "id", :type {:name "INT UNSIGNED", :size 10}, :table "players" :alias "pid"}))
+))
+
 (deftest make-select-fields 
   (let [f #(#'q/make-select-fields %)]
     (is (= "players.id,  players.name" (f [e/players-id e/players-name])))
-    (is (= "players.id" (f [e/players-id])))))
+    (is (= "players.id" (f [e/players-id])))
+    (is (= "players.id as pid,  players.name" (f [(q/as e/players-id "pid") e/players-name])))
+    (is (= "players.id as pid,  players.name as pname" (f [(q/as e/players-id "pid") (q/as e/players-name "pname")])))
+    (is (= "players.id as pid" (f [(q/as e/players-id "pid")])))))
 
 (deftest make-select-join 
   (let [f #(#'q/make-select-join %)]

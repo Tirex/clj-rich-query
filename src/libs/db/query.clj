@@ -4,8 +4,13 @@
   (:import 
    (java.sql PreparedStatement)))
 
+(defn as [field alias]
+  (conj {:alias alias} field))
+
 (defn- make-full-field-name [field]
-  (str (:table field) "." (:name field)))
+  (str (:table field) "." (:name field) 
+       (when-not (empty? (:alias field)) (str " as " (:alias field)))
+       ))
 
 (defn- join-with [items sep & [trans-fn]]
   (apply str (interpose (str sep " ") (map (or trans-fn identity) items))))
